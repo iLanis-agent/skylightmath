@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skylight math - calculators</title>
+<style>
+  :root { --accent: #3f7f8a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Georgia, 'Times New Roman', serif; background: #f4f8f9; color: #243033; line-height: 1.55; }
+  main { max-width: 1100px; margin: 0 auto; padding: 40px 20px 64px; }
+  h1 { font-size: 2rem; margin: 0 0 8px; color: var(--accent); }
+  .lede { margin: 0 0 28px; max-width: 640px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+  section { background: #fff; border: 1px solid #d7e4e7; border-radius: 8px; padding: 20px 22px; }
+  h2 { font-size: 1.15rem; margin: 0 0 6px; }
+  .hint { font-size: 0.9rem; color: #5d7c85; margin: 0 0 14px; }
+  label { display: block; font-size: 0.9rem; margin: 10px 0 3px; }
+  input { width: 100%; padding: 8px 10px; font-size: 1rem; border: 1px solid #b2cdd3; border-radius: 5px; font-family: inherit; }
+  button { margin-top: 16px; width: 100%; padding: 11px; background: var(--accent); color: #fff; border: 0; border-radius: 6px; font-size: 1rem; cursor: pointer; font-family: inherit; }
+  button:hover { filter: brightness(1.08); }
+  .out { margin-top: 14px; font-size: 1rem; min-height: 1.4em; }
+  .out.err { color: #a32222; }
+  footer { max-width: 1100px; margin: 0 auto; padding: 0 20px 40px; font-size: 0.85rem; color: #8fb0b7; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Skylight math</h1>
+  <p class="lede">Glass area against floor area, units against the target, and the summer heat that comes with the light. Exact arithmetic, every borrowed number labeled.</p>
+  <div class="grid">
+    <section>
+      <h2>Daylight plan</h2>
+      <p class="hint">The room meets the glass.</p>
+      <label for="d-l">Room length (m)</label>
+      <input id="d-l" type="number" value="4.5" min="0" step="0.1">
+      <label for="d-w">Room width (m)</label>
+      <input id="d-w" type="number" value="3.2" min="0" step="0.1">
+      <label for="d-g">Skylight glass area (sq m)</label>
+      <input id="d-g" type="number" value="1" min="0" step="0.1">
+      <button id="d-go">Judge the light</button>
+      <div class="out" id="d-out"></div>
+    </section>
+    <section>
+      <h2>Unit plan</h2>
+      <p class="hint">The target meets the catalog.</p>
+      <label for="u-t">Target glass area (sq m)</label>
+      <input id="u-t" type="number" value="2" min="0" step="0.1">
+      <label for="u-w">Unit width (cm)</label>
+      <input id="u-w" type="number" value="60" min="0" step="5">
+      <label for="u-h">Unit height (cm)</label>
+      <input id="u-h" type="number" value="90" min="0" step="5">
+      <button id="u-go">Count the units</button>
+      <div class="out" id="u-out"></div>
+    </section>
+    <section>
+      <h2>Heat plan</h2>
+      <p class="hint">The light carries warmth.</p>
+      <label for="g-a">Glass area (sq m)</label>
+      <input id="g-a" type="number" value="2" min="0" step="0.1">
+      <label for="g-h">Hours of direct sun</label>
+      <input id="g-h" type="number" value="6" min="0" step="1">
+      <button id="g-go">Weigh the heat</button>
+      <div class="out" id="g-out"></div>
+    </section>
+  </div>
+</main>
+<footer>Built by the app factory. <a href="index.html">About</a> &middot; <a href="https://github.com/iLanis-agent/skylightmath">Source</a></footer>
+<script src="engine.js"></script>
+<script>
+function num(id){ return parseFloat(document.getElementById(id).value); }
+function show(id, r, render){
+  var el = document.getElementById(id);
+  if (r.error) { el.textContent = r.error; el.classList.add('err'); }
+  else { el.textContent = render(r); el.classList.remove('err'); }
+}
+document.getElementById('d-go').addEventListener('click', function(){
+  var a=[num('d-l'),num('d-w'),num('d-g')];
+  show('d-out', SkylightMath.dayPlan.apply(null,a), function(r){ return SkylightMath.renderDay.apply(null,[r].concat(a)); });
+});
+document.getElementById('u-go').addEventListener('click', function(){
+  var a=[num('u-t'),num('u-w'),num('u-h')];
+  show('u-out', SkylightMath.unitPlan.apply(null,a), function(r){ return SkylightMath.renderUnit.apply(null,[r].concat(a)); });
+});
+document.getElementById('g-go').addEventListener('click', function(){
+  var a=[num('g-a'),num('g-h')];
+  show('g-out', SkylightMath.gainPlan.apply(null,a), function(r){ return SkylightMath.renderGain.apply(null,[r].concat(a)); });
+});
+</script>
+</body>
+</html>
